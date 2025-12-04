@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📦 Inventory Management System</h1>
+            <p>Track, manage, and update stock levels efficiently</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" onclick="showTab('products')">Products</button>
+            <button class="tab-btn" onclick="showTab('suppliers')">Suppliers</button>
+            <button class="tab-btn" onclick="showTab('transactions')">Transactions</button>
+            <button class="tab-btn" onclick="showTab('reports')">Reports</button>
+        </nav>
+
+        <!-- Products Tab -->
+        <div id="products" class="tab-content active">
+            <div class="section-header">
+                <h2>Product Management</h2>
+                <button class="btn btn-primary" onclick="showAddProductForm()">+ Add Product</button>
+            </div>
+
+            <div id="addProductForm" class="form-container" style="display: none;">
+                <h3>Add New Product</h3>
+                <form onsubmit="addProduct(event)">
+                    <input type="text" id="productName" placeholder="Product Name" required>
+                    <input type="text" id="productCategory" placeholder="Category" required>
+                    <input type="number" step="0.01" id="productPrice" placeholder="Price" required>
+                    <input type="number" id="productQuantity" placeholder="Quantity" required>
+                    <input type="number" id="productReorder" placeholder="Reorder Level" value="10">
+                    <select id="productSupplier">
+                        <option value="">Select Supplier (Optional)</option>
+                    </select>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Add Product</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideAddProductForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-container">
+                <table id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Reorder Level</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody">
+                        <tr><td colspan="8">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Suppliers Tab -->
+        <div id="suppliers" class="tab-content">
+            <div class="section-header">
+                <h2>Supplier Management</h2>
+                <button class="btn btn-primary" onclick="showAddSupplierForm()">+ Add Supplier</button>
+            </div>
+
+            <div id="addSupplierForm" class="form-container" style="display: none;">
+                <h3>Add New Supplier</h3>
+                <form onsubmit="addSupplier(event)">
+                    <input type="text" id="supplierName" placeholder="Supplier Name" required>
+                    <input type="text" id="supplierContact" placeholder="Contact Person">
+                    <input type="tel" id="supplierPhone" placeholder="Phone">
+                    <input type="email" id="supplierEmail" placeholder="Email">
+                    <textarea id="supplierAddress" placeholder="Address" rows="3"></textarea>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Add Supplier</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideAddSupplierForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-container">
+                <table id="suppliersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Contact Person</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="suppliersTableBody">
+                        <tr><td colspan="6">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Transactions Tab -->
+        <div id="transactions" class="tab-content">
+            <div class="section-header">
+                <h2>Stock Transactions</h2>
+                <button class="btn btn-primary" onclick="showAddTransactionForm()">+ New Transaction</button>
+            </div>
+
+            <div id="addTransactionForm" class="form-container" style="display: none;">
+                <h3>Add Stock Transaction</h3>
+                <form onsubmit="addTransaction(event)">
+                    <select id="transactionProduct" required>
+                        <option value="">Select Product</option>
+                    </select>
+                    <select id="transactionType" required>
+                        <option value="IN">Stock IN (Add)</option>
+                        <option value="OUT">Stock OUT (Remove)</option>
+                    </select>
+                    <input type="number" id="transactionQuantity" placeholder="Quantity" required min="1">
+                    <textarea id="transactionNotes" placeholder="Notes (Optional)" rows="2"></textarea>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Add Transaction</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideAddTransactionForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-container">
+                <table id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product ID</th>
+                            <th>Type</th>
+                            <th>Quantity</th>
+                            <th>Date</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsTableBody">
+                        <tr><td colspan="6">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reports" class="tab-content">
+            <h2>Reports & Analytics</h2>
+            
+            <div class="report-section">
+                <h3>⚠️ Low Stock Alert</h3>
+                <div class="table-container">
+                    <table id="lowStockTable">
+                        <thead>
+                            <tr>
+                                <th>Product ID</th>
+                                <th>Name</th>
+                                <th>Current Stock</th>
+                                <th>Reorder Level</th>
+                                <th>Action Needed</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lowStockTableBody">
+                            <tr><td colspan="5">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
